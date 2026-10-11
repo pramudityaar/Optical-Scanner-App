@@ -3,3 +3,5 @@ build/
 *.exe
 *.obj
 *.o
+release/
+imgui.ini

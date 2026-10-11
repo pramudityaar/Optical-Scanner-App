@@ -47,25 +47,27 @@ void AppUI::SaveDataToCSV(const std::string& filepath, int dataType) {
     file << "# --- EXPERIMENT METADATA ---\n";
     file << "# Time: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "\n";
     file << "# Gain: " << (current_gain == 0 ? "Photovoltaic" : "Photodiode") << "\n";
+    file << "# ADC Resolution: 16-bit (Raw Data)\n"; // Tambahan info metadata
     
     // -- DUMP DATA BUFFER --
     if (dataType == 0) {
         // MODE 0: LINEAR SCAN
         file << "# Mode: Linear Scan\n";
         file << "# ---------------------------\n";
-        file << "Position_mm,Intensity_mV\n";
+        file << "Position_mm,Intensity_RawADC\n"; // Header diubah ke RawADC
         
         for (size_t i = 0; i < scanData.X.size(); ++i) {
             file << scanData.X[i] << "," << scanData.Y[i] << "\n";
         }
     } else {
-        // MODE 1: FREQUENCY READ (Dengan Deteksi Frekuensi Instan)
+        // MODE 1: FREQUENCY READ 
         file << "# Mode: " << (freq_mode == 0 ? "Analog Time-Domain" : "Digital State") << "\n";
         file << "# ---------------------------\n";
-        file << "Time_s," << (freq_mode == 0 ? "Intensity_mV" : "Logic_State") << ",Instant_Freq_Hz\n";
+        // Header diubah ke RawADC
+        file << "Time_s," << (freq_mode == 0 ? "Intensity_RawADC" : "Logic_State") << ",Instant_Freq_Hz\n";
         
         // Algoritma Penentuan Garis Tengah (Threshold)
-        float threshold = 0.5f; // Default untuk digital 0/1
+        float threshold = 0.5f; 
         
         if (freq_mode == 0 && !freqData.Y.empty()) {
             float min_v = freqData.Y[0];
@@ -79,7 +81,7 @@ void AppUI::SaveDataToCSV(const std::string& filepath, int dataType) {
                     max_v = v; 
                 }
             }
-            threshold = (min_v + max_v) / 2.0f; // Ambil nilai rata-rata (mid-point)
+            threshold = (min_v + max_v) / 2.0f; 
         }
 
         // Kalkulasi Jarak Antar Puncak (Peak-to-Peak)
@@ -87,18 +89,16 @@ void AppUI::SaveDataToCSV(const std::string& filepath, int dataType) {
         float current_freq = 0.0f;
 
         for (size_t i = 0; i < freqData.X.size(); ++i) {
-            // Deteksi jika grafik memotong threshold dari bawah ke atas (Sinyal Naik)
             if (i > 0 && freqData.Y[i-1] <= threshold && freqData.Y[i] > threshold) {
                 if (last_peak_time > 0.0f) {
                     float delta_t = freqData.X[i] - last_peak_time;
                     if (delta_t > 0) {
-                        current_freq = 1.0f / delta_t; // Menghitung frekuensi saat ini
+                        current_freq = 1.0f / delta_t; 
                     }
                 }
                 last_peak_time = freqData.X[i];
             }
             
-            // Tulis baris CSV: Waktu, Nilai Grafik, Frekuensi yang dihitung
             file << freqData.X[i] << "," << freqData.Y[i] << "," << current_freq << "\n";
         }
     }
@@ -254,7 +254,6 @@ void AppUI::ParseFrequencyData(const std::string& line) {
 void AppUI::RefreshPorts() {
     available_ports = serial->GetAvailablePorts();
     
-    // Reset index agar tidak out-of-bounds
     current_port_idx = 0; 
     
     if (available_ports.empty()) {
@@ -275,7 +274,6 @@ void AppUI::Initialize(SerialManager* serialInstance) {
     io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\consola.ttf", 16.0f, &config);
     SetupIndustrialTheme();
     
-    // Scan port USB saat aplikasi pertama kali menyala
     RefreshPorts();
     
     AddLog("UI System Ready");
@@ -305,16 +303,12 @@ void AppUI::RenderHardwareStatusPanel(const ImVec2& work_pos, const ImVec2& work
     ImGui::Begin("Hardware Status", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
     
     ImGui::Text("COM Port");
-    
-    // Layout agar Dropdown dan Tombol Refresh bersebelahan
     ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 100.0f);
     
-    // Membuat array statis (char*) dari vektor C++ (std::string) agar bisa dibaca ImGui Combo
     if (available_ports.empty()) {
         const char* empty_list[] = { "None" };
         ImGui::Combo("##Port", &current_port_idx, empty_list, 1);
     } else {
-        // Konversi std::vector<std::string> ke const char* array
         std::vector<const char*> port_ptrs;
         for (const auto& p : available_ports) {
             port_ptrs.push_back(p.c_str());
@@ -480,7 +474,8 @@ void AppUI::RenderTabLinearRead() {
     ImPlotAxisFlags flags = auto_fit_scan ? ImPlotAxisFlags_AutoFit : ImPlotAxisFlags_None;
     
     if (ImPlot::BeginPlot("Linear Scan Canvas", ImVec2(-1, -1))) {
-        ImPlot::SetupAxes("Position (mm)", "Intensity (mV)", flags, flags);
+        // Label Y-Axis diganti dari (mV) menjadi (Raw ADC)
+        ImPlot::SetupAxes("Position (mm)", "Intensity (Raw ADC)", flags, flags);
         
         if (!scanData.X.empty()) {
             ImPlot::PlotLine("Intensity", scanData.X.data(), scanData.Y.data(), scanData.X.size());
@@ -548,7 +543,8 @@ void AppUI::RenderTabFrequencyRead() {
     
     if (freq_mode == 0) {
         if (ImPlot::BeginPlot("Analog Canvas", ImVec2(-1, -1))) {
-            ImPlot::SetupAxes("Time (s)", "Intensity (mV)", flags, flags);
+            // Label Y-Axis diganti dari (mV) menjadi (Raw ADC)
+            ImPlot::SetupAxes("Time (s)", "Intensity (Raw ADC)", flags, flags);
             
             if (!freqData.X.empty()) {
                 ImPlot::PlotLine("Intensity", freqData.X.data(), freqData.Y.data(), freqData.X.size());
