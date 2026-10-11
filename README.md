@@ -122,6 +122,7 @@ Optical-Scanner-App/
 
 ## 📄 License & Attribution
 
-Developed for optical laboratory instrumentation and academic research under **Prof. Hery Suyanto**[cite: 1].  
-Author: **Pramuditya Adha Ra'afarudin (Sheilla)**[cite: 1].  
+Developed for optical laboratory instrumentation and academic research under **Prof. Hery Suyanto**.  
+Author: **Pramuditya Adha Ra'afarudin**. 
+Institution: **Udayana University**.
 Released for scientific and educational use.
