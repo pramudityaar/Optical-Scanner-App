@@ -8,13 +8,13 @@
 
 A high-precision desktop instrumentation and real-time data acquisition (DAQ) application engineered for automated 1D optical beam profiling, spatial intensity measurements, and photodetector frequency response analysis.
 
-Designed according to **Technical Reference Manual (TRM) v2.0**[cite: 1], this software interfaces seamlessly with dual-core ESP32 firmware to perform micrometer-level linear scans and high-frequency sensor reading[cite: 2].
+Designed according to **Technical Reference Manual (TRM) v2.0**, this software interfaces seamlessly with dual-core ESP32 firmware to perform micrometer-level linear scans and high-frequency sensor reading.
 
 ---
 
 ## 📸 Key Highlights & Features
 
-- **Industrial Gray UI Architecture:** Designed with strict industrial standards, high-contrast readability, and a strict 3-word labeling rule for minimalist laboratory workflows[cite: 2].
+- **Industrial Gray UI Architecture:** Designed with strict industrial standards, high-contrast readability, and a strict 3-word labeling rule for minimalist laboratory workflows.
 - **Dynamic COM Port Enumerator:** Native Windows API scanning (`QueryDosDeviceA`) to automatically detect active serial devices without manual guesswork.
 - **High-Speed Serial Communication:** High-throughput streaming at **921,600 bps** using a low-overhead, deterministic ASCII command protocol.
 - **Multi-Mode Visualization:**
@@ -29,10 +29,10 @@ Designed according to **Technical Reference Manual (TRM) v2.0**[cite: 1], this s
 
 | Subsystem | Component | Specifications |
 | :--- | :--- | :--- |
-| **Master Controller** | WEMOS LOLIN D32 | ESP32 Dual-Core @ 240 MHz, FreeRTOS[cite: 2] |
-| **Motion Actuator** | NEMA 17 + TMC2209 | SilentStepStick, SFU1204 Ball Screw (800 steps/mm)[cite: 2] |
-| **Analog Detection** | Photodiode + Micrometer Slit | ADS1115 (16-bit $\Delta\Sigma$ ADC via I2C, 100 kHz)[cite: 2] |
-| **Digital Detection** | Wemos D1 Mini | High-speed logic state recording[cite: 2] |
+| **Master Controller** | WEMOS LOLIN D32 | ESP32 Dual-Core @ 240 MHz, FreeRTOS |
+| **Motion Actuator** | NEMA 17 + TMC2209 | SilentStepStick, SFU1204 Ball Screw (800 steps/mm) |
+| **Analog Detection** | Photodiode + Micrometer Slit | ADS1115 (16-bit $\Delta\Sigma$ ADC via I2C, 100 kHz) |
+| **Digital Detection** | Wemos D1 Mini | High-speed logic state recording |
 
 ---
 
@@ -46,7 +46,7 @@ All commands are transmitted without bloatware text at **921,600 bps, 8N1**:
 | `G` | Start 1D linear scan | `SL` $\rightarrow$ `[Stream Data]` $\rightarrow$ `EL` |
 | `A` | Start analog time-domain read | `SA` $\rightarrow$ `[Stream Data]` $\rightarrow$ `EA` |
 | `W` | Start digital logic state read | `SD` $\rightarrow$ `[Stream Data]` $\rightarrow$ `ED` |
-| `M0` / `M1` | Set ADC Gain (0: Photovoltaic, 1: Photodiode) | `M,0` / `M,1`[cite: 2] |
+| `M0` / `M1` | Set ADC Gain (0: Photovoltaic, 1: Photodiode) | `M,0` / `M,1` |
 | `P<val>` | Move to absolute position (e.g., `P25.5`) | `P,<val>` |
 | `C,<steps>,<speed>` | Configure motor calibration (e.g., `C,800,15`) | `C,OK` |
 | `?` | Query current stage position | `P,<position>` |
@@ -123,6 +123,6 @@ Optical-Scanner-App/
 ## 📄 License & Attribution
 
 Developed for optical laboratory instrumentation and academic research under **Prof. Hery Suyanto**.  
-Author: **Pramuditya Adha Ra'afarudin**. 
-Institution: **Udayana University**.
+Author: **Pramuditya Adha Ra'afarudin**.  
+Institution: **Udayana University**.  
 Released for scientific and educational use.
